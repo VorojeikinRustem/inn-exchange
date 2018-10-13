@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <div class="form-group">
+                    <h2>Exchange</h2>
+                        <form action="{% url 'exchange' %}" method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit">Submit</button>
+                        </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
