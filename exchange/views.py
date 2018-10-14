@@ -1,10 +1,8 @@
 from django.shortcuts import render, redirect
-
-from django.views.generic.edit import CreateView
-from django.views.generic import FormView, TemplateView
+from django.views.generic import TemplateView
+from django.db.models import F
 
 from exchange.forms import ProfileForm
-
 from exchange.models import Profile
 
 
@@ -16,32 +14,20 @@ def make_exchange_great_again(request):
     if request.method == "POST":
         form = ProfileForm(request.POST)
         if form.is_valid():
-            print("form: " + str(form.cleaned_data))
+            # get cleaned data
+            user = form.cleaned_data['user']
+            inn = form.cleaned_data['inn']
+            price = form.cleaned_data['price']
+            # reduce price of user
+            profile = Profile.objects.get(user=user)
+            profile.price -= price
+            profile.save()
+            # add price to selected users
+            profiles_count = Profile.objects.filter(inn=inn).count()
+            price_upd = price/profiles_count
+            Profile.objects.filter(inn=inn).update(price=F("price") + price_upd)
+
             return redirect('exchange')
     else:
         form = ProfileForm()
     return render(request, 'exchange/exchange.html', {'form': form})
-
-
-#
-#
-# class ExchangeView(FormView):
-#     form_class = ProfileForm
-#     template_name = "exchange/exchange.html"
-#     success_url = "/"
-#
-#     # def post(self, request, *args, **kwargs):
-#     #     resp = super().post(request, *args, **kwargs)
-#     #     print("POST() METHOD")
-#     #
-#     #     return resp
-#
-#     def form_valid(self, form):
-#         print("form_valid()")
-#         return super().form_valid(form)
-#
-#     def get(self, request, *args, **kwargs):
-#         resp = super().get(request, *args, **kwargs)
-#         print("GET() METHOD")
-#         return resp
-#

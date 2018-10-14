@@ -23,7 +23,6 @@ class ProfileForm(forms.Form):
             )
         return price
 
-
     def clean_user(self):
         username_id = self.cleaned_data.get("user")
         user = User.objects.filter(id=username_id)
@@ -36,12 +35,11 @@ class ProfileForm(forms.Form):
     def clean_inn(self):
         inn_number = self.cleaned_data.get("inn")
 
-        inn = Inn.objects.filter(inn=inn_number).exists()
+        inn = Inn.objects.filter(inn=inn_number)
 
-        if not inn:
+        if not inn.exists():
             raise forms.ValidationError(
                 "Inn does not exist"
             )
 
-        return inn
-
+        return inn[0]
